@@ -10,5 +10,5 @@ import me.splm.app.wenetjudger.helper.NetType;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface WeNetJudger {
-    @NetType String type() default NetType.AUTO;
+    @NetType String value() default NetType.AUTO;
 }

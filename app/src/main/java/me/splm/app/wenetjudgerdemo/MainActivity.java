@@ -17,9 +17,9 @@ public class MainActivity extends AppCompatActivity {
         NetManager.getDefault().registerObserver(this);
     }
 
-    @WeNetJudger(type = NetType.WIFI)
-    public void test(@NetType String type){
-        Log.e("***********", "test: "+type);
+    @WeNetJudger(NetType.WIFI)
+    public void test(@NetType String type) {
+        Log.e("***********", "test: " + type);
     }
 
     @Override

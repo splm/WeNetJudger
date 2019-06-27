@@ -123,7 +123,7 @@ public class NetChangeReceiver extends BroadcastReceiver {
                 throw new RuntimeException(m.getName() + "返回参数只有一个");
             }
 
-            MethodManager methodManager = new MethodManager(parameterTypes[0], annotation.type(), m);
+            MethodManager methodManager = new MethodManager(parameterTypes[0], annotation.value(), m);
             methodList.add(methodManager);
 
         }
