@@ -14,6 +14,27 @@
 
 ## 使用
 
+```
+[![](https://jitpack.io/v/splm/WeNetJudger.svg)](https://jitpack.io/#splm/WeNetJudger)
+```
+
+> - ```groovy
+>   allprojects {
+>       repositories {
+>           ...
+>               maven { url 'https://jitpack.io' }
+>       }
+>   }
+>   ```
+>
+> - ```groovy
+>   dependencies {
+>       implementation 'com.github.splm:WeNetJudger:0.0.8.1'
+>   }
+>   ```
+>
+> - 一定要先申请好权限`android.permission.READ_PHONE_STATE`，否则一切都是零，如果想用权限框架请前往https://github.com/splm/WePermission，同样也是自己开发的；
+>
 > - 先定义好一个Application，然后再其onCreate方法中加入：
 >
 >   ```java
