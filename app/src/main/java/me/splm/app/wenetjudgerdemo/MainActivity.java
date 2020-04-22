@@ -16,7 +16,7 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        WeNetManager.getDefault().registerObserver(this);
+        //WeNetManager.getDefault().registerObserver(this);
         Button testBtn_1 = findViewById(R.id.testBtn_1);
         testBtn_1.setText("第一个界面调用");
         Button testBtn_2 = findViewById(R.id.testBtn_2);
