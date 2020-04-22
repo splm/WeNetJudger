@@ -5,21 +5,21 @@ import android.content.IntentFilter;
 
 import me.splm.app.wenetjudger.helper.NetHelper;
 
-public class NetManager {
-    private static volatile NetManager instance;
+public class WeNetManager {
+    private static volatile WeNetManager instance;
 
     private NetChangeReceiver mReceiver;
     private Application mApplication;
 
-    public NetManager() {
+    public WeNetManager() {
         mReceiver = new NetChangeReceiver();
     }
 
-    public static NetManager getDefault() {
+    public static WeNetManager getDefault() {
         if (instance == null) {
-            synchronized (NetManager.class) {
+            synchronized (WeNetManager.class) {
                 if (instance == null) {
-                    instance = new NetManager();
+                    instance = new WeNetManager();
                 }
             }
         }
@@ -40,13 +40,17 @@ public class NetManager {
         mApplication.registerReceiver(mReceiver, intentFilter);
     }
 
+    public void invoke(Object object,String tag, Object... objects) {
+        mReceiver.post2(object,tag,objects);
+    }
+
 
     public void logout() {
         getApplication().unregisterReceiver(mReceiver);
     }
 
-    public void registerObserver(Object activity) {
-        mReceiver.registerObserver(activity);
+    public void registerObserver(Object target) {
+        mReceiver.registerObserver(target);
     }
 
     public void unRegisterObserver(Object activity) {

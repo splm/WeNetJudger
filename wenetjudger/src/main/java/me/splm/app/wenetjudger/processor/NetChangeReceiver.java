@@ -3,7 +3,12 @@ package me.splm.app.wenetjudger.processor;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkInfo;
+import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -18,14 +23,8 @@ import me.splm.app.wenetjudger.helper.NetHelper;
 import me.splm.app.wenetjudger.helper.NetType;
 
 public class NetChangeReceiver extends BroadcastReceiver {
-    Map<Object, List<MethodManager>> mNetworkList = new HashMap<>();
-    List<MethodManager> mMethodList = new ArrayList<>();
-    @NetType
-    private String type;
-
-    public NetChangeReceiver() {
-        this.type = NetType.NONE;
-    }
+    private Map<Object, NetChangeProcessor> netChangeProcessorMap = new HashMap<>();
+    NetChangeProcessor mProcessor;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -33,114 +32,33 @@ public class NetChangeReceiver extends BroadcastReceiver {
             return;
         }
         if (intent.getAction().equalsIgnoreCase(NetHelper.ANDROID_NET_CHANGE_ACTION)) {
-            type = NetHelper.getNetworkType();
-            post(type);
+            boolean isNetWorked = NetHelper.isNetWorkAvailable();
+            mProcessor.post(isNetWorked);
         }
     }
+
+    public void post2(Object object, String tag, Object... objects) {
+        NetChangeProcessor processor = netChangeProcessorMap.get(object);
+        if (processor != null) {
+            processor.post2(object, tag, objects);
+        }
+    }
+
     public void registerObserver(Object register) {
         //获取当前Activity or Fragment中所有的网络监听注解方法
-        mMethodList = mNetworkList.get(register);
-        if (mMethodList == null) {//说明已经注册过了
-            mMethodList = findAnnotationMethod(register);
-            mNetworkList.put(register, mMethodList);
+        mProcessor = netChangeProcessorMap.get(register);
+        if (mProcessor == null) {
+            mProcessor = new NetChangeProcessor();
+            netChangeProcessorMap.put(register, mProcessor);
         }
-    }
-
-    private void post(@NetType String netType) {
-        Set<Object> set = mNetworkList.keySet();
-        for (Object o : set) {
-            List<MethodManager> methodManagerList = mNetworkList.get(o);
-            if (methodManagerList == null) {
-                return;
-            }
-            for (MethodManager manager : methodManagerList) {
-                if (manager.getType().isAssignableFrom(netType.getClass())) {//如果注解上的参数和当前网络状态相同
-
-                    switch (manager.getNetType()) {
-                        case NetType.AUTO:
-                            invoke(manager, o, netType);//反射运行方法
-                            break;
-                        case NetType.CMNET:
-                            if (netType.equals(NetType.CMNET) || netType.equals(NetType.NONE)) {
-                                invoke(manager, o, netType);
-                            }
-                            break;
-                        case NetType.CMWAP:
-                            if (netType.equals(NetType.CMWAP) || netType.equals(NetType.NONE)) {
-                                invoke(manager, o, netType);
-                            }
-                            break;
-                        case NetType.WIFI:
-                            if (netType.equals(NetType.WIFI) || netType.equals(NetType.NONE)) {
-                                invoke(manager, o, netType);
-                            }
-                            break;
-                        case NetType.NONE:
-                            invoke(manager, o, netType);
-                            break;
-                    }
-                }
-            }
-        }
-
-    }
-
-    /**
-     * @param manager 方法管理类
-     * @param o       方法所有者（activity/Fragment）
-     * @param netType 网络类型参数
-     */
-    private void invoke(MethodManager manager, Object o, String netType) {
-        Method executeMethod = manager.getMethod();
-        try {
-            executeMethod.invoke(o, netType);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-    }
-    private List<MethodManager> findAnnotationMethod(Object register) {
-        List<MethodManager> methodList = new ArrayList<>();
-        Class<?> clazz = register.getClass();
-        Method[] method = clazz.getMethods();
-        //遍历方法
-        for (Method m : method) {
-            //找出所有注解方法
-            WeNetJudger annotation = m.getAnnotation(WeNetJudger.class);
-            if (annotation == null) {
-                continue;
-            }
-            //判断返回类型
-            Type genericReturnType = m.getGenericReturnType();
-            if (!"void".equals(genericReturnType.toString())) {
-                throw new RuntimeException(m.getName() + "返回类型必须是void");
-            }
-
-            //参数校验
-            Class<?>[] parameterTypes = m.getParameterTypes();
-            if (parameterTypes.length != 1) {
-                throw new RuntimeException(m.getName() + "返回参数只有一个");
-            }
-
-            MethodManager methodManager = new MethodManager(parameterTypes[0], annotation.value(), m);
-            methodList.add(methodManager);
-
-        }
-        return methodList;
+        mProcessor.registerObserver(register);
     }
 
     public void unRegisterObserver(Object register) {
-        if (!mNetworkList.isEmpty()) {//说明有广播被注册过
-            mNetworkList.remove(register);
-        }
-        Log.i("***********", register.getClass().getName() + "注销成功了");
+        mProcessor.unRegisterObserver(register);
     }
 
     public void unRegisterAllObserver() {
-        if (!mNetworkList.isEmpty()) {//说明有广播被注册过
-            mNetworkList.clear();
-        }
-        NetManager.getDefault().logout();//注销
+        mProcessor.unRegisterAllObserver();
     }
 }

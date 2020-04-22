@@ -7,9 +7,8 @@ import java.lang.annotation.Target;
 
 import me.splm.app.wenetjudger.helper.NetType;
 
-@Target(ElementType.METHOD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface WeNetJudger {
-    @NetType int limit() default NetType.NETWORK_2G;
-    String tag() default "";
+public @interface WeNetChanger {
+    boolean value() default false;
 }
