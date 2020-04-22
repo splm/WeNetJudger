@@ -2,6 +2,7 @@ package me.splm.app.wenetjudger.processor;
 
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -49,7 +50,8 @@ public class NetChangeProcessor {
                                 }
                                 return;
                             }
-                            //TODO 当网络类型不匹配时执行
+                            //TODO 当网络类型不匹配时执行,网络类型不匹配最低要求
+                            Toast.makeText(WeNetManager.getDefault().getApplication(),"当前网络情况无法满足请求要求",Toast.LENGTH_SHORT).show();
                             Log.e("*********", "post2: 网络类型不匹配最低要求");
                         }
                     }
