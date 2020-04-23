@@ -3,6 +3,7 @@ package me.splm.app.wenetjudgerdemo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Toast;
 
 import me.splm.app.wenetjudger.processor.INetChangedNotifier;
 import me.splm.app.wenetjudger.processor.WeNetManager;
@@ -20,10 +21,10 @@ public class BaseActivity extends AppCompatActivity implements INetChangedNotifi
 
     @Override
     public void onNetFound(boolean isWhat) {
-        if(isWhat){
-            Log.e("---------", "onNetFound: base网络可用" );
-        }else{
-            Log.e("---------", "onNetFound: base网络不可用" );
+        if (isWhat) {
+            Toast.makeText(this, "base网络可用", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, "base网络不可用", Toast.LENGTH_LONG).show();
         }
     }
 }

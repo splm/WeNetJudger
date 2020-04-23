@@ -8,19 +8,24 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
+import android.util.SparseArray;
 
 import me.splm.app.wenetjudger.processor.WeNetManager;
 
 public class NetHelper {
-    public static final int NETWORK_NONE = -1; // 没有网络连接
-    public static final int NETWORK_AVAILABLE = 0; // 有网络连接
-    public static final int NETWORK_WIFI = 1; // wifi连接
-    public static final int NETWORK_2G = 2; // 2G
-    public static final int NETWORK_3G = 3; // 3G
-    public static final int NETWORK_4G = 4; // 4G
-    public static final int NETWORK_MOBILE = 5; // 手机流量
-
     public static final String ANDROID_NET_CHANGE_ACTION = "android.net.conn.CONNECTIVITY_CHANGE";
+    private static final SparseArray<String> TagTable = new SparseArray<>();
+
+    static {
+        TagTable.put(NetType.NETWORK_NONE, "没有网络连接");
+        TagTable.put(NetType.NETWORK_AVAILABLE, "网络可用");
+        TagTable.put(NetType.NETWORK_MOBILE, "手机流量");
+        TagTable.put(NetType.NETWORK_2G, "2G");
+        TagTable.put(NetType.NETWORK_3G, "3G");
+        TagTable.put(NetType.NETWORK_4G, "4G");
+        TagTable.put(NetType.NETWORK_WIFI, "WIFI");
+
+    }
 
     public static boolean isNetWorkAvailable() {
         ConnectivityManager manager = (ConnectivityManager) WeNetManager.getDefault().getApplication().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -45,7 +50,7 @@ public class NetHelper {
         ConnectivityManager connManager = (ConnectivityManager) WeNetManager.getDefault().getApplication().getSystemService(Context.CONNECTIVITY_SERVICE); // 获取网络服务
         // 获取网络类型，如果为空，返回无网络
         if (!isNetWorkAvailable()) {
-            return NETWORK_NONE;
+            return NetType.NETWORK_NONE;
         }
         // 判断是否为WIFI
         NetworkInfo wifiInfo = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
@@ -53,7 +58,7 @@ public class NetHelper {
             NetworkInfo.State state = wifiInfo.getState();
             if (null != state) {
                 if (state == NetworkInfo.State.CONNECTED || state == NetworkInfo.State.CONNECTING) {
-                    return NETWORK_WIFI;
+                    return NetType.NETWORK_WIFI;
                 }
             }
         }
@@ -84,7 +89,7 @@ public class NetHelper {
             case TelephonyManager.NETWORK_TYPE_EDGE:
             case TelephonyManager.NETWORK_TYPE_1xRTT:
             case TelephonyManager.NETWORK_TYPE_IDEN:
-                return NETWORK_2G;
+                return NetType.NETWORK_2G;
             // 3G网络
             case TelephonyManager.NETWORK_TYPE_EVDO_A:
             case TelephonyManager.NETWORK_TYPE_UMTS:
@@ -95,13 +100,18 @@ public class NetHelper {
             case TelephonyManager.NETWORK_TYPE_EVDO_B:
             case TelephonyManager.NETWORK_TYPE_EHRPD:
             case TelephonyManager.NETWORK_TYPE_HSPAP:
-                return NETWORK_3G;
+                return NetType.NETWORK_3G;
             // 4G网络
             case TelephonyManager.NETWORK_TYPE_LTE:
-                return NETWORK_4G;
+                return NetType.NETWORK_4G;
             default:
-                return NETWORK_AVAILABLE;
+                return NetType.NETWORK_AVAILABLE;
         }
+    }
+
+    public static String getNetworkTypeTag() {
+        int type = getNetworkType();
+        return TagTable.get(type);
     }
 
     /**

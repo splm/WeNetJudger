@@ -24,7 +24,12 @@ import me.splm.app.wenetjudger.helper.NetType;
 
 public class NetChangeReceiver extends BroadcastReceiver {
     private Map<Object, NetChangeProcessor> netChangeProcessorMap = new HashMap<>();
-    NetChangeProcessor mProcessor;
+    private NetChangeProcessor mProcessor;
+    private IAlertUI alertUI;
+
+    public NetChangeReceiver(IAlertUI alertUI) {
+        this.alertUI = alertUI;
+    }
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -48,7 +53,7 @@ public class NetChangeReceiver extends BroadcastReceiver {
         //获取当前Activity or Fragment中所有的网络监听注解方法
         mProcessor = netChangeProcessorMap.get(register);
         if (mProcessor == null) {
-            mProcessor = new NetChangeProcessor();
+            mProcessor = new NetChangeProcessor(alertUI);
             netChangeProcessorMap.put(register, mProcessor);
         }
         mProcessor.registerObserver(register);

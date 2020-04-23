@@ -19,6 +19,11 @@ public class NetChangeProcessor {
     private List<INetChangedNotifier> mClassLists = new ArrayList<>();
     private Map<Object, List<MethodHolder>> mNetworkLists = new HashMap<>();
     private List<MethodHolder> mMethodLists = new ArrayList<>();
+    private IAlertUI alertUI;
+
+    public NetChangeProcessor(IAlertUI alertUI) {
+        this.alertUI = alertUI;
+    }
 
     public void registerObserver(Object register) {
         //获取当前Activity or Fragment中所有的网络监听注解方法
@@ -48,11 +53,9 @@ public class NetChangeProcessor {
                                 if(holder instanceof INetChangedNotifier){
                                     ((INetChangedNotifier) holder).onNetFound(false);
                                 }
-                                return;
                             }
                             //TODO 当网络类型不匹配时执行,网络类型不匹配最低要求
-                            Toast.makeText(WeNetManager.getDefault().getApplication(),"当前网络情况无法满足请求要求",Toast.LENGTH_SHORT).show();
-                            Log.e("*********", "post2: 网络类型不匹配最低要求");
+                            alertUI.alert();
                         }
                     }
                 }

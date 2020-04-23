@@ -1,7 +1,10 @@
 package me.splm.app.wenetjudger.processor;
 
+import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.content.IntentFilter;
+import android.os.Bundle;
 
 import me.splm.app.wenetjudger.helper.NetHelper;
 
@@ -10,10 +13,8 @@ public class WeNetManager {
 
     private NetChangeReceiver mReceiver;
     private Application mApplication;
-
-    public WeNetManager() {
-        mReceiver = new NetChangeReceiver();
-    }
+    private IAlertUI alertUI;
+    private Context mContext;
 
     public static WeNetManager getDefault() {
         if (instance == null) {
@@ -37,11 +38,16 @@ public class WeNetManager {
         this.mApplication = application;
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(NetHelper.ANDROID_NET_CHANGE_ACTION);
+        mReceiver = new NetChangeReceiver(alertUI == null ? new DefaultAlertUI(mApplication) : alertUI);
         mApplication.registerReceiver(mReceiver, intentFilter);
     }
 
-    public void invoke(Object object,String tag, Object... objects) {
-        mReceiver.post2(object,tag,objects);
+    public void setAlertUI(IAlertUI alertUI) {
+        this.alertUI = alertUI;
+    }
+
+    public void invoke(Object object, String tag, Object... objects) {
+        mReceiver.post2(object, tag, objects);
     }
 
 
